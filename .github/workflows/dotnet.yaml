@@ -1,0 +1,32 @@
+name: .NET Build and Publish (Self-Hosted)
+
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: self-hosted  # 👈 uses your own runner
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x' # adjust version if needed
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Publish project
+        run: dotnet publish --configuration Release  src/Presentation/Nop.Web/Nop.Web.csproj --output ./publish
+
+      # Optional: Upload build artifacts for later use
+      - name: Upload publish folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-app
+          path: ./publish
