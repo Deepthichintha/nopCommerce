@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: code checkout
+      - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: sonarqube cloud integration
+      - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -20,25 +20,28 @@ jobs:
             -Dsonar.projectKey=Deepthichintha_nopCommerce
             -Dsonar.organization=deepthichintha
             -Dsonar.host.url=https://sonarcloud.io
-      - name: dotnet installation
+
+      - name: Install .NET
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "9.0.100"
-      - name: aws configurations
+
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.aws-region }}
-      - name: ecr login
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: ECR Login
         uses: aws-actions/amazon-ecr-login@v2
-      - name: docker build image
-        uses: docker/build-push-action@v6
-      - name: ecr commands
-        run: 
-             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 248703573306.dkr.ecr.us-east-1.amazonaws.com
-             docker build -t nopcommerce .
-             docker tag nopcommerce:latest 248703573306.dkr.ecr.us-east-1.amazonaws.com/nopcommerce:latest
-             docker push 248703573306.dkr.ecr.us-east-1.amazonaws.com/nopcommerce:latest
-      - name: this is my dotnet project
-        run: dotnet publish -c release src/Presentation/Nop.Web/Nop.Web.csproj -o demo
+
+      - name: Build and Push Docker Image
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 248703573306.dkr.ecr.us-east-1.amazonaws.com
+          docker build -t nopcommerce .
+          docker tag nopcommerce:latest 248703573306.dkr.ecr.us-east-1.amazonaws.com/nopcommerce:latest
+          docker push 248703573306.dkr.ecr.us-east-1.amazonaws.com/nopcommerce:latest
+
+      - name: Publish .NET Project
+        run: dotnet publish -c Release src/Presentation/Nop.Web/Nop.Web.csproj -o demo
