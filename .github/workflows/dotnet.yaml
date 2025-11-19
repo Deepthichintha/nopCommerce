@@ -20,6 +20,9 @@ jobs:
             -Dsonar.projectKey=Deepthichintha_nopCommerce
             -Dsonar.organization=deepthichintha
             -Dsonar.host.url=https://sonarcloud.io
-
+      - name: dotnet installation
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "9.0.100"
       - name: this is my dotnet project
         run: dotnet publish -c release src/Presentation/Nop.Web/Nop.Web.csproj -o demo
