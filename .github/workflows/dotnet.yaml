@@ -9,5 +9,12 @@ jobs:
     steps:
       - name: code checkout
         uses: actions/checkout@v5
+      - name: sonarqube cloud integration
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          mysonartoken: ${{ secrets.SONAR_TOKEN }}
+        with:
+        arg: >
+          mysonarurl: ${{ secrets.SONAR_HOST_URL }}
       - name: this is my dotnet project
         run: dotnet publish -c release src/Presentation/Nop.Web/Nop.Web.csproj -o demo
