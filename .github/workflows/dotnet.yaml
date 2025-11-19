@@ -24,5 +24,21 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "9.0.100"
+      - name: aws configurations
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.aws-region }}
+      - name: ecr login
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: docker build image
+        uses: docker/build-push-action@v6
+      - name: ecr commands
+        run: 
+             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 248703573306.dkr.ecr.us-east-1.amazonaws.com
+             docker build -t nopcommerce .
+             docker tag nopcommerce:latest 248703573306.dkr.ecr.us-east-1.amazonaws.com/nopcommerce:latest
+             docker push 248703573306.dkr.ecr.us-east-1.amazonaws.com/nopcommerce:latest
       - name: this is my dotnet project
         run: dotnet publish -c release src/Presentation/Nop.Web/Nop.Web.csproj -o demo
