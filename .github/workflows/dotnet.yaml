@@ -43,5 +43,16 @@ jobs:
           docker tag nopcommerce:latest 248703573306.dkr.ecr.us-east-1.amazonaws.com/nopcommerce:latest
           docker push 248703573306.dkr.ecr.us-east-1.amazonaws.com/nopcommerce:latest
 
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '248703573306.dkr.ecr.us-east-1.amazonaws.com/nopcommerce'
+          format: 'table'
+          output: 'trivy-results.xml'
+          exit-code: '0'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
       - name: Publish .NET Project
-        run: dotnet publish -c Release src/Presentation/Nop.Web/Nop.Web.csproj -o demo
+        run: |
+          dotnet publish -c Release src/Presentation/Nop.Web/Nop.Web.csproj -o demo
